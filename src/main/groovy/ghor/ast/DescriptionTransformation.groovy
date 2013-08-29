@@ -8,10 +8,10 @@ import org.codehaus.groovy.transform.*
 import org.codehaus.groovy.control.*
 
 @GroovyASTTransformation(phase=CompilePhase.SEMANTIC_ANALYSIS)
-public class DescriptionTransformation extends CommandTransformation implements ASTTransformation {
+public class DescriptionTransformation extends GhorTransformation implements ASTTransformation {
 
     public void visit(ASTNode[] nodes, SourceUnit sourceUnit) {
-        if (!checkNodes(nodes, Description.class.name)) return
+        if (!checkMethodNode(nodes, Description.class.name)) return
 
         def methodNode = nodes[1]
         def annotation = nodes[0].members.value
