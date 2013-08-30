@@ -2,9 +2,14 @@
 package ghor
 
 class Ghor {
+  public static Map getCommands() {
+    def map = [:]
+    addCommands(map)
+    map
+  }
 
-  def options = [:]
-  def commands = [:]
+  private static void addCommands(map) {
+  }
 
   public void start(String... argv) {
     println "Start called..."

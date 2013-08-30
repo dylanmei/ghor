@@ -9,24 +9,32 @@ import org.codehaus.groovy.transform.*
 import org.codehaus.groovy.control.*
 
 @GroovyASTTransformation(phase=CompilePhase.SEMANTIC_ANALYSIS)
-public class CommandTransformation extends GhorTransformation implements ASTTransformation {
+public class CommandTransformation extends GhorTransformation {
 
-    public void visit(ASTNode[] nodes, SourceUnit sourceUnit) {
-        if (!checkFieldNode(nodes, Command.class.name)) return
+  public CommandTransformation() {
+    super(Command.class)
+  }
 
-        def fieldNode = nodes[1]
-        def fieldType = fieldNode.getType()
-        if (!checkCommandType(fieldType)) return
+  protected void applyAnnotation(AnnotationNode annotationNode, MethodNode methodNode) {
+    def type = methodNode.getDeclaringClass()
+    if (!checkCommandType(type)) return
 
-        if (!fieldNode.hasInitialExpression()) {
-          def initExpression = new ConstructorCallExpression(fieldNode.getType(), new ArgumentListExpression())
-          fieldNode.setInitialValueExpression(initExpression)
-          // need to inject an initial expression
-//          println fieldNode.getType()
-        }
+    // TODO: Add expressions to Ghor.addCommands
+  }
+
+  protected void applyAnnotation(AnnotationNode annotationNode, FieldNode fieldNode) {
+    def type = fieldNode.getDeclaringClass()
+    if (!checkCommandType(type)) return
+
+    // TODO: Add expressions to Ghor.addCommands
+
+    if (!fieldNode.hasInitialExpression()) {
+      def initExpression = new ConstructorCallExpression(fieldNode.getType(), new ArgumentListExpression())
+      fieldNode.setInitialValueExpression(initExpression)
     }
+  }
 
-    Boolean checkCommandType(ClassNode fieldType) {
-      return fieldType.isDerivedFrom(new ClassNode(Ghor.class))
-    }
+  Boolean checkCommandType(ClassNode commandType) {
+    return commandType.isDerivedFrom(new ClassNode(Ghor.class))
+  }
 }

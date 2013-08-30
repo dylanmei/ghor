@@ -8,20 +8,16 @@ import org.codehaus.groovy.transform.*
 import org.codehaus.groovy.control.*
 
 @GroovyASTTransformation(phase=CompilePhase.SEMANTIC_ANALYSIS)
-public class DescriptionTransformation extends GhorTransformation implements ASTTransformation {
+public class DescriptionTransformation extends GhorTransformation {
 
-    public void visit(ASTNode[] nodes, SourceUnit sourceUnit) {
-        if (!checkMethodNode(nodes, Description.class.name)) return
+  public DescriptionTransformation() {
+    super(Description.class)
+  }
 
-        def methodNode = nodes[1]
-        def annotation = nodes[0].members.value
-        if (annotation.class != ConstantExpression) {
-            // add better error handling
-            return
-        }        
-
-        def message = createPrintlnAst("Description of $methodNode.name: $annotation.value")
-        def existingStatements = methodNode.getCode().getStatements()
-        existingStatements.add(0, message)
-    }
+  protected void applyAnnotation(AnnotationNode annotationNode, MethodNode methodNode) {
+    def annotation = annotationNode.members.value
+    def message = createPrintlnAst("Description of $methodNode.name: $annotation.value")
+    def existingStatements = methodNode.getCode().getStatements()
+    existingStatements.add(0, message)
+  }
 }
