@@ -23,6 +23,6 @@ class AstSpec extends Specification {
     when:
       commands = type.metaCommands
     then:
-      commands['App:func'] != null
+      commands['App:func'] instanceof MetaCommand
   }
 }

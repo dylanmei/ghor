@@ -8,7 +8,6 @@ class MetaBuilder {
   }
 
   def command(name) {
-    println "MetaBuilder.command($name)"
-    commands.put(name, 1)
+    commands.put(name, new MetaCommand(name))
   }
 }
