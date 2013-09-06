@@ -12,7 +12,6 @@ public class OptionTransformation extends GhorTransformation {
 
   public OptionTransformation() {
     super(Option.class)
-    println Option.class
   }
 
   protected void applyAnnotation(AnnotationNode annotationNode, MethodNode methodNode) {

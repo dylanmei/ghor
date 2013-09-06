@@ -2,6 +2,7 @@
 import ghor.*
 
 class Git extends Ghor {
+
   @Description("Fetches named heads or tags from one or more other repositories, along with the objects necessary to complete them.")
   @Option(name = 'all', description = 'Fetch all remotes.')
   @Option(name = 'multiple', description = 'Allow several <repository> and <group> arguments to be specified. No <refspec>s may be specified.')
@@ -16,9 +17,8 @@ class Git extends Ghor {
 //    @Description("Manage the set of repositories ('remotes') whose branches you track.")
 //    @Alias('r')
 //    @Default('show')
-  @Command GitRemote remote
+//  @Command GitRemote remote
 }
 
-class GitRemote extends Ghor {
-
-}
+//class GitRemote extends Ghor {
+//}

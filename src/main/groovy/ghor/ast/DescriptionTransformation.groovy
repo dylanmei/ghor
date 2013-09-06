@@ -17,6 +17,7 @@ public class DescriptionTransformation extends GhorTransformation {
   protected void applyAnnotation(AnnotationNode annotationNode, MethodNode methodNode) {
     def annotation = annotationNode.members.value
     def message = createPrintlnAst("Description of $methodNode.name: $annotation.value")
+
     def existingStatements = methodNode.getCode().getStatements()
     existingStatements.add(0, message)
   }
