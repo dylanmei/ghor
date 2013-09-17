@@ -27,26 +27,21 @@ public class CommandTransformation extends GhorTransformation {
     if (!canTransformType(classNode))
       return
 
-    if (!hasInitializer(classNode))
-      setupInitializer(classNode)
+    if (!hasInitializedBuilder(classNode))
+      initializeBuilder(classNode)
 
     classNode.addStaticInitializerStatements(
-      buildTransformer(classNode, methodNode), false)
+      buildCommand(classNode, methodNode), false)
   }
 
-  def setupInitializer(classNode) {
-    classNode.addStaticInitializerStatements(buildInitializer(), false)
-    classNode.setNodeMetaData('hasInitializer', true)
+  def hasInitializedBuilder(classNode) {
+    classNode.getNodeMetaData('builderReady') ?: false
   }
 
-  def hasInitializer(classNode) {
-    classNode.getNodeMetaData('hasInitializer') ?: false
-  }
-
-  def buildInitializer() {
+  def initializeBuilder(classNode) {
     // http://svn.codehaus.org/groovy/tags/GROOVY_1_7_6/src/test/org/codehaus/groovy/
     // ast/builder/AstBuilderFromSpecificationTest.groovy
-    new AstBuilder().buildFromSpec {
+    def initializer = new AstBuilder().buildFromSpec {
       expression {
         declaration {
           variable 'builder'
@@ -59,20 +54,59 @@ public class CommandTransformation extends GhorTransformation {
         }
       }
     }
+    classNode.addStaticInitializerStatements(initializer, false)
+    classNode.setNodeMetaData('builderReady', true)
   }
 
-  def buildTransformer(ClassNode classNode, MethodNode methodNode) {
-    new AstBuilder().buildFromSpec {
-      expression {
-        methodCall {
-          variable 'builder'
-          constant 'command'
-          argumentList {
-            constant classNode.name + ':' + methodNode.name
+  def buildCommand(ClassNode classNode, MethodNode methodNode) {
+    def params = methodNode.getParameters()
+    if (params.size()) {
+      methodNode.getParameters().collect { p ->
+        buildArgument(classNode, methodNode, p)
+      }.flatten()
+    }
+    else {
+      new AstBuilder().buildFromSpec {
+        expression {
+          methodCall {
+            variable 'builder'
+            constant 'command'
+            argumentList {
+              constant classNode.name + ':' + methodNode.name
+            }
           }
         }
       }
-    }    
+    }
+  }
+
+  def buildArgument(ClassNode classNode, MethodNode methodNode, Parameter param) {
+    new AstBuilder().buildFromSpec {
+      block {
+        expression {
+          declaration {
+            variable 'command'
+            token '='
+            methodCall {
+              variable 'builder'
+              constant 'command'
+              argumentList {
+                constant classNode.name + ':' + methodNode.name
+              }
+            }
+          }
+        }
+        expression {
+          methodCall {
+            variable 'command'
+            constant 'argument'
+            argumentList {
+              constant param.name
+            }
+          }
+        }
+      }
+    }
   }
 
   protected void applyAnnotation(AnnotationNode annotationNode, FieldNode fieldNode) {

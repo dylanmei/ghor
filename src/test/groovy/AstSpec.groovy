@@ -12,8 +12,8 @@ class AstSpec extends Specification {
     type    
   }
 
-  def 'app with method command'() {
-    def commands
+  def 'app with command'() {
+    def command
     def type = loadClass('''
       import ghor.*
       class App extends Ghor {
@@ -21,8 +21,23 @@ class AstSpec extends Specification {
       }''')
 
     when:
-      commands = type.metaCommands
+      command = type.metaCommands['App:func']
     then:
-      commands['App:func'] instanceof Command
+      command instanceof Command
+  }
+
+  def 'app with command and arguments'() {
+    def command
+    def type = loadClass('''
+      import ghor.*
+      class App extends Ghor {
+        @Command def func(user, password) {}
+      }''')
+
+    when:
+      command = type.metaCommands['App:func']
+    then:
+      command.arguments[0] == 'user'
+      command.arguments[1] == 'password'
   }
 }
