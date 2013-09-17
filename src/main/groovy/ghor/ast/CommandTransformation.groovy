@@ -2,7 +2,7 @@ package ghor.ast
 
 import ghor.Ghor
 import ghor.Command
-import ghor.MetaBuilder
+import ghor.meta.AppBuilder
 import org.codehaus.groovy.ast.*
 import org.codehaus.groovy.ast.expr.*
 import org.codehaus.groovy.ast.stmt.*
@@ -17,7 +17,6 @@ public class CommandTransformation extends GhorTransformation {
   static int PRIVATE = 2
   static int PROTECTED = 4
   static int STATIC = 8
-
 
   public CommandTransformation() {
     super(Command.class)
@@ -52,7 +51,7 @@ public class CommandTransformation extends GhorTransformation {
         declaration {
           variable 'builder'
           token '='
-          constructorCall(MetaBuilder) {
+          constructorCall(AppBuilder) {
             argumentList {
               variable 'metaCommands'
             }
@@ -79,8 +78,6 @@ public class CommandTransformation extends GhorTransformation {
   protected void applyAnnotation(AnnotationNode annotationNode, FieldNode fieldNode) {
     def type = fieldNode.getDeclaringClass()
     if (!canTransformType(type)) return
-
-    // TODO: Add expressions to Class.addCommands
 
     if (!fieldNode.hasInitialExpression()) {
       def initExpression = new ConstructorCallExpression(fieldNode.getType(), new ArgumentListExpression())

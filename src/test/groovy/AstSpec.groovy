@@ -1,7 +1,7 @@
 
 package ghor.specs
 
-import ghor.*
+import ghor.meta.*
 import spock.lang.*
 
 class AstSpec extends Specification {
@@ -23,6 +23,6 @@ class AstSpec extends Specification {
     when:
       commands = type.metaCommands
     then:
-      commands['App:func'] instanceof MetaCommand
+      commands['App:func'] instanceof Command
   }
 }

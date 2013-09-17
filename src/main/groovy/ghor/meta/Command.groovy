@@ -1,13 +1,13 @@
-package ghor
+package ghor.meta
 
-class MetaCommand {
+class Command {
   def name
   def nodeName
   def arguments = []
   def options = []
   def description = ''
 
-  public MetaCommand(nodeName) {
+  public Command(nodeName) {
     this.nodeName = nodeName
     this.name = nodeName.split(':')[1]
   }
