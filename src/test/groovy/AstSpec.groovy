@@ -12,7 +12,7 @@ class AstSpec extends Specification {
     type    
   }
 
-  def 'app with command'() {
+  def 'app command'() {
     def command
     def type = loadClass('''
       import ghor.*
@@ -26,7 +26,22 @@ class AstSpec extends Specification {
       command instanceof Command
   }
 
-  def 'app with command and arguments'() {
+  def 'app command with descrition'() {
+    def command
+    def type = loadClass('''
+      import ghor.*
+      class App extends Ghor {
+        @Description("hello")
+        @Command def func() {}
+      }''')
+
+    when:
+      command = type.metaCommands['App:func']
+    then:
+      command.description == 'hello'
+  }
+
+  def 'app command with arguments'() {
     def command
     def type = loadClass('''
       import ghor.*

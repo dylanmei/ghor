@@ -1,8 +1,6 @@
 package ghor.ast
 
-import ghor.Ghor
 import ghor.Command
-import ghor.meta.AppBuilder
 import org.codehaus.groovy.ast.*
 import org.codehaus.groovy.ast.expr.*
 import org.codehaus.groovy.ast.stmt.*
@@ -22,65 +20,43 @@ public class CommandTransformation extends GhorTransformation {
     super(Command.class)
   }
 
-  protected void applyAnnotation(AnnotationNode annotationNode, MethodNode methodNode) {
-    def classNode = methodNode.getDeclaringClass()
-    if (!canTransformType(classNode))
-      return
+//  protected List transform_annotation_to_statements(AnnotationNode annotationNode, ClassNode classNode, FieldNode fieldNode) {
+//    def type = fieldNode.getDeclaringClass()
+//    if (!canTransformType(type)) return
+//
+//    if (!fieldNode.hasInitialExpression()) {
+//      def initExpression = new ConstructorCallExpression(fieldNode.getType(), new ArgumentListExpression())
+//      fieldNode.setInitialValueExpression(initExpression)
+//    }
+//  }
 
-    if (!hasInitializedBuilder(classNode))
-      initializeBuilder(classNode)
-
-    classNode.addStaticInitializerStatements(
-      buildCommand(classNode, methodNode), false)
-  }
-
-  def hasInitializedBuilder(classNode) {
-    classNode.getNodeMetaData('builderReady') ?: false
-  }
-
-  def initializeBuilder(classNode) {
-    // http://svn.codehaus.org/groovy/tags/GROOVY_1_7_6/src/test/org/codehaus/groovy/
-    // ast/builder/AstBuilderFromSpecificationTest.groovy
-    def initializer = new AstBuilder().buildFromSpec {
-      expression {
-        declaration {
-          variable 'builder'
-          token '='
-          constructorCall(AppBuilder) {
-            argumentList {
-              variable 'metaCommands'
-            }
-          } 
-        }
-      }
-    }
-    classNode.addStaticInitializerStatements(initializer, false)
-    classNode.setNodeMetaData('builderReady', true)
-  }
-
-  def buildCommand(ClassNode classNode, MethodNode methodNode) {
+  protected List transform_annotation_to_statements(AnnotationNode annotationNode, ClassNode classNode, MethodNode methodNode) {
     def params = methodNode.getParameters()
     if (params.size()) {
       methodNode.getParameters().collect { p ->
-        buildArgument(classNode, methodNode, p)
+        param_to_argument_statement(classNode, methodNode, p)
       }.flatten()
     }
     else {
-      new AstBuilder().buildFromSpec {
-        expression {
-          methodCall {
-            variable 'builder'
-            constant 'command'
-            argumentList {
-              constant classNode.name + ':' + methodNode.name
-            }
+      method_to_command_statement(classNode, methodNode)
+    }
+  }
+
+  List method_to_command_statement(ClassNode classNode, MethodNode methodNode) {
+    new AstBuilder().buildFromSpec {
+      expression {
+        methodCall {
+          variable 'builder'
+          constant 'command'
+          argumentList {
+            constant classNode.name + ':' + methodNode.name
           }
         }
       }
     }
   }
 
-  def buildArgument(ClassNode classNode, MethodNode methodNode, Parameter param) {
+  List param_to_argument_statement(ClassNode classNode, MethodNode methodNode, Parameter param) {
     new AstBuilder().buildFromSpec {
       block {
         expression {
@@ -107,19 +83,5 @@ public class CommandTransformation extends GhorTransformation {
         }
       }
     }
-  }
-
-  protected void applyAnnotation(AnnotationNode annotationNode, FieldNode fieldNode) {
-    def type = fieldNode.getDeclaringClass()
-    if (!canTransformType(type)) return
-
-    if (!fieldNode.hasInitialExpression()) {
-      def initExpression = new ConstructorCallExpression(fieldNode.getType(), new ArgumentListExpression())
-      fieldNode.setInitialValueExpression(initExpression)
-    }
-  }
-
-  Boolean canTransformType(ClassNode commandType) {
-    return commandType.isDerivedFrom(new ClassNode(Ghor.class))
   }
 }

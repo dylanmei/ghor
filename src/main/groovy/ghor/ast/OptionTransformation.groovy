@@ -14,17 +14,17 @@ public class OptionTransformation extends GhorTransformation {
     super(Option.class)
   }
 
-  protected void applyAnnotation(AnnotationNode annotationNode, MethodNode methodNode) {
-    def name = annotationNode.members.name
-    def desc = annotationNode.members.description
-    def alias = annotationNode.members.alias
+//  protected List transform_annotation_to_statements(AnnotationNode annotationNode, ClassNode classNode, MethodNode methodNode) {
+//    def name = annotationNode.members.name
+//    def desc = annotationNode.members.description
+//    def alias = annotationNode.members.alias
 
-    def text = "Option $name.value: $desc.value"
-    if (alias)
-      text += "; alias: --$alias.value"
+//    def text = "Option $name.value: $desc.value"
+//    if (alias)
+//      text += "; alias: --$alias.value"
 
-    def message = createPrintlnAst(text)
-    def existingStatements = methodNode.getCode().getStatements()
-    existingStatements.add(0, message)
-  }
+//    def message = createPrintlnAst(text)
+//    def existingStatements = methodNode.getCode().getStatements()
+//    existingStatements.add(0, message)
+//  }
 }

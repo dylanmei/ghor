@@ -2,7 +2,6 @@
 package ghor
 
 class Ghor {
-
   static def metaCommands = [:]
 
   public void start(String... argv) {
@@ -10,6 +9,5 @@ class Ghor {
     metaCommands.each {
       println it
     }
-
   }
 }
