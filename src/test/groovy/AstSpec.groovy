@@ -55,4 +55,22 @@ class AstSpec extends Specification {
       command.arguments[0] == 'user'
       command.arguments[1] == 'password'
   }
+
+  def 'app command with option'() {
+    def command
+    def type = loadClass('''
+      import ghor.*
+      class App extends Ghor {
+        @Option(name="help", alias="h", description="show help")
+        @Command def func(user, password) {}
+      }''')
+
+    when:
+      command = type.metaCommands['App:func']
+    then:
+      command.options[0] != null
+      command.options[0].name == 'help'
+      command.options[0].alias == 'h'
+      command.options[0].description == 'show help'
+  }
 }
